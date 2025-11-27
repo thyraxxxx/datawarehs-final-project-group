@@ -89,9 +89,9 @@ if target_col in df.columns and target_col != "TARGET_RETURNED":
 # These names may vary by dataset version, so we drop only if they exist.
 high_card_cols = [
     "LOCATION", "LOCN_DETAIL", "STREET1", "STREET2",
-    "INTERSECTION", "BIKE_SERIAL_NUMBER", "BIKE_SERIAL_NO",
-    "BIKE_MODEL", "BIKE_MAKE", "DIVISION",
-    "LATITUDE", "LONGITUDE", "X", "Y"
+    "INTERSECTION", "HOOD_158", "HOOD_140",
+    "BIKE_MAKE", "DIVISION",
+    "LAT_WGS84", "LONG_WGS84", "x", "y"
 ]
 
 cols_to_drop = [c for c in high_card_cols if c in df.columns]
@@ -115,6 +115,20 @@ for col in numeric_cols:
 # Fill categorical missing with mode
 for col in categorical_cols:
     df[col] = df[col].fillna(df[col].mode()[0])
+    
+missing_count = df.isnull().sum()
+
+# series of percentages between each column and missing percentage
+missing_pct = (missing_count / len(df)) * 100
+
+# table between each column, missing counts, and missing percentages
+missing_summary = pd.DataFrame({
+    'missing_count': missing_count,
+    'missing_pct': missing_pct.round(2)
+}).sort_values('missing_pct', ascending=False)
+
+print("Missing values per column")
+print(missing_summary)
 
 print("Missing after cleaning:\n", df.isnull().sum().head())
 
@@ -140,7 +154,7 @@ scaler = StandardScaler()
 
 predictor_cols = [c for c in df.columns if c != "TARGET_RETURNED"]
 df[predictor_cols] = scaler.fit_transform(df[predictor_cols])
-
+print("The Features where Standardize")
 
 # =========================
 # 7) BUILD X, Y
