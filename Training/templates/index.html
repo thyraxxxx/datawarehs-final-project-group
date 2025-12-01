@@ -7,7 +7,7 @@
     <style>
            body {
         font-family: Arial, sans-serif;
-        background-color: #f0f2f5; /* light grey background */
+        background-color: #f0f2f5; 
         color: #333;
         margin: 0;
         padding: 0;
@@ -23,7 +23,7 @@
     }
 
     .header h1 {
-        color: #1e3a8a; /* dark blue */
+        color: #1e3a8a; 
         margin-bottom: 5px;
     }
 
@@ -47,7 +47,7 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
-        color: #1e3a8a; /* blue labels */
+        color: #1e3a8a; 
     }
 
     input[type="number"],
@@ -62,7 +62,7 @@
     button {
         width: 100%;
         padding: 12px;
-        background-color: #1e3a8a; /* dark blue */
+        background-color: #1e3a8a; 
         color: #fff;
         border: none;
         border-radius: 5px;
@@ -72,11 +72,11 @@
     }
 
     button:hover {
-        background-color: #3b82f6; /* lighter blue on hover */
+        background-color: #3b82f6; 
     }
 
     .info-box {
-        background-color: #e0f2fe; /* light blue box */
+        background-color: #e0f2fe; 
         padding: 10px 15px;
         border-left: 5px solid #1e3a8a;
         margin-bottom: 15px;
@@ -103,13 +103,13 @@
     }
 
     .error {
-        background-color: #fee2e2; /* red tint for error */
+        background-color: #fee2e2; 
         color: #b91c1c;
         font-weight: bold;
     }
 
     .result {
-        background-color: #e0f2fe; /* light blue */
+        background-color: #e0f2fe; 
         color: #1e3a8a;
     }
 
@@ -122,7 +122,7 @@
     .progress-bar {
         width: 100%;
         height: 15px;
-        background-color: #cbd5e1; /* grey bar */
+        background-color: #cbd5e1; 
         border-radius: 10px;
         overflow: hidden;
         margin-top: 5px;
@@ -130,17 +130,17 @@
 
     .progress-fill {
         height: 100%;
-        background-color: #1e3a8a; /* blue fill */
+        background-color: #1e3a8a; 
         border-radius: 10px;
         width: 0;
     }
 
     .result.recovered {
-        border-left: 5px solid #10b981; /* green for recovered */
+        border-left: 5px solid #10b981; 
     }
 
     .result.not-recovered {
-        border-left: 5px solid #ef4444; /* red for not recovered */
+        border-left: 5px solid #ef4444;
     }
     </style>
 </head>
@@ -288,10 +288,10 @@
         try {
             const response = await fetch('/health');
             if (response.ok) {
-                console.log('✅ Connected to Flask API');
+                console.log('Connected to Flask API');
             }
         } catch (error) {
-            console.error('❌ Cannot connect to Flask API:', error);
+            console.error('Cannot connect to Flask API:', error);
         }
     });
 
@@ -303,7 +303,6 @@
         errorMessage.textContent = '';
         loading.classList.add('show');
 
-        // Build proper date strings
         const occYear = document.getElementById('occ_year').value;
         const occMonth = String(document.getElementById('occ_month').value).padStart(2, '0');
         const occDay = '15';
@@ -312,13 +311,11 @@
         const occDate = `${occYear}-${occMonth}-${occDay} ${occHour}:00:00`;
         const reportDate = `${occYear}-${occMonth}-${occDay} ${occHour}:00:00`;
 
-        // Arrays for mapping
         const bikeTypes = ["MT", "RG", "HY", "BM", "OT"];
         const premisesTypes = ["Other", "Apartment", "House", "Commercial"];
         const locationTypes = ["Outside", "House", "Apartment", "Commercial"];
         const bikeColours = ["BLK", "BLU", "RED", "WHI", "SIL", "OTH"];
 
-        // Get dropdown values and convert to integers
         const bikeTypeIndex = parseInt(document.getElementById('bike_type').value);
         const premisesTypeIndex = parseInt(document.getElementById('premises_type').value);
         const locationTypeIndex = parseInt(document.getElementById('location_type').value);
@@ -366,7 +363,7 @@
             displayResult(result);
             
         } catch (error) {
-            console.error('❌ Error:', error);
+            console.error('Error:', error);
             loading.classList.remove('show');
             errorMessage.textContent = 'Error: ' + error.message;
             errorMessage.classList.add('show');
@@ -394,11 +391,11 @@
         console.log('Displaying - Prediction:', prediction, 'Confidence:', confidence);
         
         if (prediction === 1) {
-            statusEl.textContent = '✅ Bicycle Likely to be Returned';
+            statusEl.textContent = 'Bicycle Likely to be Returned';
             statusEl.className = 'result-status returned';
             statusEl.style.color = '#10b981';
         } else {
-            statusEl.textContent = '❌ Bicycle Unlikely to be Returned';
+            statusEl.textContent = 'Bicycle Unlikely to be Returned';
             statusEl.className = 'result-status not-returned';
             statusEl.style.color = '#ef4444';
         }
