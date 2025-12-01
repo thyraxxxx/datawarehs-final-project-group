@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bicycle Theft Prediction System</title>
+    <style>
+           body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5; /* light grey background */
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+        color: #1e3a8a; /* dark blue */
+        margin-bottom: 5px;
+    }
+
+    .header p {
+        color: #555;
+        margin-top: 0;
+    }
+
+    form .form-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .form-section {
+        flex: 1;
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #1e3a8a; /* blue labels */
+    }
+
+    input[type="number"],
+    input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #1e3a8a; /* dark blue */
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #3b82f6; /* lighter blue on hover */
+    }
+
+    .info-box {
+        background-color: #e0f2fe; /* light blue box */
+        padding: 10px 15px;
+        border-left: 5px solid #1e3a8a;
+        margin-bottom: 15px;
+        color: #1e3a8a;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .loading, .error, .result {
+        display: none;
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    .loading.show, .error.show, .result.show {
+        display: block;
+    }
+
+    .loading {
+        background-color: #f3f4f6;
+        color: #1e3a8a;
+        text-align: center;
+    }
+
+    .error {
+        background-color: #fee2e2; /* red tint for error */
+        color: #b91c1c;
+        font-weight: bold;
+    }
+
+    .result {
+        background-color: #e0f2fe; /* light blue */
+        color: #1e3a8a;
+    }
+
+    .result-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 15px;
+        background-color: #cbd5e1; /* grey bar */
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background-color: #1e3a8a; /* blue fill */
+        border-radius: 10px;
+        width: 0;
+    }
+
+    .result.recovered {
+        border-left: 5px solid #10b981; /* green for recovered */
+    }
+
+    .result.not-recovered {
+        border-left: 5px solid #ef4444; /* red for not recovered */
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bicycle Theft Prediction</h1>
+            <p>Toronto Police Department - ML Model Prediction System</p>
+        </div>
+
+        <div class="content">
+            <form id="predictionForm">
+                <div class="form-section">
+                    <h2>Occurrence Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="occ_year">Occurrence Year</label>
+                            <input type="number" id="occ_year" required min="2014" max="2025" value="2024">
+                        </div>
+                        <div class="form-group">
+                            <label for="occ_month">Occurrence Month</label>
+                            <select id="occ_month" required>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="occ_dow">Day of Week</label>
+                            <select id="occ_dow" required>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="7">Sunday</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="occ_hour">Occurrence Hour</label>
+                            <input type="number" id="occ_hour" required min="0" max="23" value="12">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Location Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="location_type">Location Type</label>
+                            <select id="location_type" required>
+                                <option value="0">Outside</option>
+                                <option value="1">House</option>
+                                <option value="2">Apartment</option>
+                                <option value="3">Commercial</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="premises_type">Premises Type</label>
+                            <select id="premises_type" required>
+                                <option value="0">Other</option>
+                                <option value="1">Apartment</option>
+                                <option value="2">House</option>
+                                <option value="3">Commercial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Bicycle Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="bike_type">Bicycle Type</label>
+                            <select id="bike_type" required>
+                                <option value="0">Mountain</option>
+                                <option value="1">Road</option>
+                                <option value="2">Hybrid</option>
+                                <option value="3">BMX</option>
+                                <option value="4">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bike_speed">Number of Speeds</label>
+                            <input type="number" id="bike_speed" required min="1" max="30" value="18">
+                        </div>
+                        <div class="form-group">
+                            <label for="bike_colour">Bicycle Color</label>
+                            <select id="bike_colour" required>
+                                <option value="0">Black</option>
+                                <option value="1">Blue</option>
+                                <option value="2">Red</option>
+                                <option value="3">White</option>
+                                <option value="4">Silver</option>
+                                <option value="5">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="bike_cost">Bicycle Cost ($)</label>
+                            <input type="number" id="bike_cost" required min="0" value="500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn-predict">Predict</button>
+                    <button type="reset" class="btn-reset">Reset</button>
+                </div>
+            </form>
+
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: #667eea; font-weight: 600;">Analyzing data...</p>
+            </div>
+
+            <div class="error-message"></div>
+
+            <div class="result-section">
+                <div class="result-header">
+                    <div class="result-status"></div>
+                    <div class="result-probability"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <script>
+    const form = document.getElementById('predictionForm');
+    const loading = document.querySelector('.loading');
+    const resultSection = document.querySelector('.result-section');
+    const errorMessage = document.querySelector('.error-message');
+
+    // Test connection on page load
+    window.addEventListener('load', async () => {
+        try {
+            const response = await fetch('/health');
+            if (response.ok) {
+                console.log('✅ Connected to Flask API');
+            }
+        } catch (error) {
+            console.error('❌ Cannot connect to Flask API:', error);
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        resultSection.classList.remove('show');
+        errorMessage.classList.remove('show');
+        errorMessage.textContent = '';
+        loading.classList.add('show');
+
+        // Build proper date strings
+        const occYear = document.getElementById('occ_year').value;
+        const occMonth = String(document.getElementById('occ_month').value).padStart(2, '0');
+        const occDay = '15';
+        const occHour = String(document.getElementById('occ_hour').value).padStart(2, '0');
+        
+        const occDate = `${occYear}-${occMonth}-${occDay} ${occHour}:00:00`;
+        const reportDate = `${occYear}-${occMonth}-${occDay} ${occHour}:00:00`;
+
+        // Arrays for mapping
+        const bikeTypes = ["MT", "RG", "HY", "BM", "OT"];
+        const premisesTypes = ["Other", "Apartment", "House", "Commercial"];
+        const locationTypes = ["Outside", "House", "Apartment", "Commercial"];
+        const bikeColours = ["BLK", "BLU", "RED", "WHI", "SIL", "OTH"];
+
+        // Get dropdown values and convert to integers
+        const bikeTypeIndex = parseInt(document.getElementById('bike_type').value);
+        const premisesTypeIndex = parseInt(document.getElementById('premises_type').value);
+        const locationTypeIndex = parseInt(document.getElementById('location_type').value);
+        const bikeColourIndex = parseInt(document.getElementById('bike_colour').value);
+
+        const formData = {
+            OCC_DATE: occDate,
+            REPORT_DATE: reportDate,
+            NEIGHBOURHOOD_158: "77",
+            BIKE_MODEL: "Generic",
+            BIKE_TYPE: bikeTypes[bikeTypeIndex],
+            PRIMARY_OFFENCE: "Theft Under",
+            BIKE_COST: parseInt(document.getElementById('bike_cost').value),
+            PREMISES_TYPE: premisesTypes[premisesTypeIndex],
+            LOCATION_TYPE: locationTypes[locationTypeIndex],
+            EVENT_UNIQUE_ID: "PRED-" + Date.now(),
+            BIKE_SPEED: parseInt(document.getElementById('bike_speed').value),
+            NEIGHBOURHOOD_140: "165",
+            BIKE_COLOUR: bikeColours[bikeColourIndex]
+        };
+
+        console.log('📤 Sending data:', formData);
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                throw new Error(errorData.error || 'Prediction failed');
+            }
+
+            const result = await response.json();
+            console.log('📥 Received result:', result);
+            
+            loading.classList.remove('show');
+            displayResult(result);
+            
+        } catch (error) {
+            console.error('❌ Error:', error);
+            loading.classList.remove('show');
+            errorMessage.textContent = 'Error: ' + error.message;
+            errorMessage.classList.add('show');
+            errorMessage.style.display = 'block';
+            errorMessage.style.backgroundColor = '#fee2e2';
+            errorMessage.style.color = '#b91c1c';
+            errorMessage.style.padding = '15px';
+            errorMessage.style.borderRadius = '5px';
+            errorMessage.style.marginTop = '20px';
+        }
+    });
+
+    function displayResult(result) {
+        const statusEl = document.querySelector('.result-status');
+        const probEl = document.querySelector('.result-probability');
+        
+        if (!statusEl || !probEl) {
+            console.error('Result elements not found!');
+            return;
+        }
+        
+        const prediction = parseInt(result.prediction);
+        const confidence = result.probability || 50;
+        
+        console.log('Displaying - Prediction:', prediction, 'Confidence:', confidence);
+        
+        if (prediction === 1) {
+            statusEl.textContent = '✅ Bicycle Likely to be Returned';
+            statusEl.className = 'result-status returned';
+            statusEl.style.color = '#10b981';
+        } else {
+            statusEl.textContent = '❌ Bicycle Unlikely to be Returned';
+            statusEl.className = 'result-status not-returned';
+            statusEl.style.color = '#ef4444';
+        }
+        
+        probEl.textContent = `Confidence: ${confidence.toFixed(1)}%`;
+        probEl.style.fontSize = '16px';
+        probEl.style.marginTop = '10px';
+        
+        resultSection.style.display = 'block';
+        resultSection.style.backgroundColor = '#e0f2fe';
+        resultSection.style.padding = '20px';
+        resultSection.style.borderRadius = '5px';
+        resultSection.style.marginTop = '20px';
+        resultSection.classList.add('show');
+    }
+
+    form.addEventListener('reset', () => {
+        resultSection.classList.remove('show');
+        resultSection.style.display = 'none';
+        errorMessage.classList.remove('show');
+        errorMessage.style.display = 'none';
+    });
+</script>
+</body>
+</html>
