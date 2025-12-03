@@ -3,21 +3,21 @@ Bicycle Theft â€“ Data & EDA
 """
 
 ########## Import libraries ##########
-import pandas as pd      # table for data
-import numpy as np       # numeric helpers
-import matplotlib.pyplot as plt  # plotting
+import pandas as pd      
+import numpy as np      
+import matplotlib.pyplot as plt  
 import seaborn as sns    
-import os                # for file paths
+import os                
 
 plt.style.use("default")
 pd.set_option("display.max_columns", None)
 
 ########## Load data ##########
 
-# full path to bicycle theft csv in Downloads\data
+
 fullpath = r"C:\Users\thyra\Downloads\data\bicycle_thefts.csv"
 
-# read csv into df
+
 df = pd.read_csv(fullpath)
 
 print("Data loaded")
@@ -98,7 +98,7 @@ if len(numeric_cols) > 1:
     # heatmap between numeric columns and their correlation values
     plt.figure(figsize=(10,8))
     sns.heatmap(corr, annot=False, cmap='coolwarm', square=True)
-    plt.title('Correlation Heatmap â€“ Numeric Features')
+    plt.title('Correlation Heatmap“ Numeric Features')
     plt.tight_layout()
     plt.show()
 else:
@@ -118,7 +118,7 @@ cost_col   = "BIKE_COST"         # reported cost of bike
 
 for col in [year_col, month_col, dow_col, hour_col, area_col, status_col, cost_col]:
     if col not in df.columns:
-        print("Column", col, "not found â€“ update this name if needed")
+        print("Column", col, "not found“ update this name if needed")
 
 ########## Trend: thefts by year (sliced from 2013) ##########
 if year_col in df.columns:
