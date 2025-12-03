@@ -1,5 +1,5 @@
 """
-Bicycle Theft – Data & EDA
+Bicycle Theft â€“ Data & EDA
 """
 
 ########## Import libraries ##########
@@ -98,7 +98,7 @@ if len(numeric_cols) > 1:
     # heatmap between numeric columns and their correlation values
     plt.figure(figsize=(10,8))
     sns.heatmap(corr, annot=False, cmap='coolwarm', square=True)
-    plt.title('Correlation Heatmap – Numeric Features')
+    plt.title('Correlation Heatmap â€“ Numeric Features')
     plt.tight_layout()
     plt.show()
 else:
@@ -118,27 +118,40 @@ cost_col   = "BIKE_COST"         # reported cost of bike
 
 for col in [year_col, month_col, dow_col, hour_col, area_col, status_col, cost_col]:
     if col not in df.columns:
-        print("Column", col, "not found – update this name if needed")
+        print("Column", col, "not found â€“ update this name if needed")
 
-########## Trend: thefts by year ##########
+########## Trend: thefts by year (sliced from 2013) ##########
 if year_col in df.columns:
+    
+    df_year = df[df[year_col] >= 2013]
+
     # bar graph between year (x-axis) and number of thefts (y-axis)
-    year_counts = df[year_col].value_counts().sort_index()
+    year_counts = df_year[year_col].value_counts().sort_index()
     plt.figure(figsize=(8,4))
     year_counts.plot(kind='bar')
-    plt.title('Trend of Bicycle Thefts by Year')   # shows increase/decrease over years
+    plt.title('Trend of Bicycle Thefts by Year')
     plt.xlabel('Year')
     plt.ylabel('Number of Thefts')
     plt.tight_layout()
     plt.show()
-
-########## Trend: thefts by month (seasonality) ##########
+    
+########## Trend: thefts by month ##########
 if month_col in df.columns:
+    
+    month_order = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ]
+
+    
+    month_counts = df[month_col].value_counts()
+    month_counts = month_counts.reindex(month_order, fill_value=0)
+
     # bar graph between month (x-axis) and number of thefts (y-axis)
-    month_counts = df[month_col].value_counts().sort_index()
     plt.figure(figsize=(8,4))
     month_counts.plot(kind='bar')
-    plt.title('Seasonal Pattern of Bicycle Thefts by Month')  # shows which months are highest
+    plt.title('Bicycle Thefts by Month')
     plt.xlabel('Month')
     plt.ylabel('Number of Thefts')
     plt.tight_layout()
@@ -146,11 +159,18 @@ if month_col in df.columns:
 
 ########## Trend: thefts by day of week ##########
 if dow_col in df.columns:
+    
+    dow_order = ["Monday", "Tuesday", "Wednesday",
+                 "Thursday", "Friday", "Saturday", "Sunday"]
+
+    
+    dow_counts = df[dow_col].value_counts()
+    dow_counts = dow_counts.reindex(dow_order, fill_value=0)
+
     # bar graph between day of week (x-axis) and number of thefts (y-axis)
-    dow_counts = df[dow_col].value_counts().sort_index()
     plt.figure(figsize=(8,4))
     dow_counts.plot(kind='bar')
-    plt.title('Bicycle Thefts by Day of Week')  # shows which weekdays/weekend days are higher
+    plt.title('Bicycle Thefts by Day of Week')
     plt.xlabel('Day of Week')
     plt.ylabel('Number of Thefts')
     plt.tight_layout()
@@ -168,16 +188,25 @@ if hour_col in df.columns:
     plt.tight_layout()
     plt.show()
 
-########## Distribution: cost of stolen bikes ##########
+
 if cost_col in df.columns:
-    # histogram between bike cost (x-axis) and number of bikes (y-axis)
+    
+    cost_max_display = 10000
+    cost_filtered = df[df[cost_col] <= cost_max_display][cost_col].dropna()
+    high_cost_count = (df[cost_col] > cost_max_display).sum()
+    print(f"Number of bikes with cost > {cost_max_display}: ", high_cost_count)
+    bins = range(0, cost_max_display + 500, 500)
+
     plt.figure(figsize=(8,4))
-    plt.hist(df[cost_col].dropna(), bins=40)
-    plt.title('Distribution of Reported Bike Cost')  # shows common price ranges for stolen bikes
+    plt.hist(cost_filtered, bins=bins)
+    plt.title('Distribution of Reported Bike Cost (0–10,000 $)')
     plt.xlabel('Bike Cost ($)')
     plt.ylabel('Number of Bikes')
+    plt.xlim(0, cost_max_display)
     plt.tight_layout()
     plt.show()
+
+    
 
 ########## Status of cases (stolen vs recovered) ##########
 if status_col in df.columns:
@@ -192,21 +221,39 @@ if status_col in df.columns:
 
 ########## Hotspot: top neighbourhoods ##########
 if area_col in df.columns:
-    # bar graph between neighbourhood (x-axis) and theft count (y-axis)
-    plt.figure(figsize=(10,4))
-    df[area_col].value_counts().head(15).plot(kind='bar')
-    plt.title('Top 15 Neighbourhoods for Bicycle Thefts')  # shows hotspot areas in the city
+    # counts for top 15 neighbourhoods
+    area_counts = df[area_col].value_counts().head(15)
+    max_count = area_counts.max()
+
+    plt.figure(figsize=(10, 5))
+    area_counts.plot(kind='bar')
+
+    plt.title('Top 15 Neighbourhoods for Bicycle Thefts')
     plt.xlabel('Neighbourhood')
     plt.ylabel('Number of Thefts')
+
+    
+    plt.ylim(0, max_count + 200)
+    plt.yticks(range(0, max_count + 201, 200))
+
+    plt.xticks(rotation=45, ha='right')
+
     plt.tight_layout()
     plt.show()
 
-########## Heatmap: day of week vs hour (when thefts happen) ##########
+########## Heatmap: day of week vs hour ##########
 if (dow_col in df.columns) and (hour_col in df.columns):
+    dow_order = ["Monday", "Tuesday", "Wednesday",
+                 "Thursday", "Friday", "Saturday", "Sunday"]
+
     # table between day of week and hour of day with theft counts
     pivot_time = pd.crosstab(df[dow_col], df[hour_col])
+
+   
+    pivot_time = pivot_time.reindex(dow_order)
+
     # heatmap between (day of week, hour) and theft count
-    plt.figure(figsize=(12,5))
+    plt.figure(figsize=(12, 5))
     sns.heatmap(pivot_time, cmap='Blues')
     plt.title('Heatmap of Bicycle Thefts: Day of Week vs Hour')
     plt.xlabel('Hour of Day')
