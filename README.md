@@ -7,7 +7,7 @@
 - Deksan Said & Naheed Imani – Deployment & API Lead  
 
 ## Project Overview
-This project analyzes Toronto bicycle theft data from 2014-2019 and builds a predictive model to estimate the probability that a stolen bike will be recovered.  
+This project analyzes Toronto bicycle theft data from 2014-2025 and builds a predictive model to estimate the probability that a stolen bike will be recovered.  
 The final solution includes:
 - Data exploration and visualization  
 - Feature engineering and model building  
